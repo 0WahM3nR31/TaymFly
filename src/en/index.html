@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyJourney - Book Your Perfect Flight</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+        
+        .hero-section {
+            background: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80') no-repeat center center;
+            background-size: cover;
+            position: relative;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .search-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .form-input {
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .form-input:focus {
+            background: white;
+        }
+        
+        .cabin-class-option {
+            transition: all 0.3s ease;
+        }
+        
+        .cabin-class-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cabin-class-option.selected {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .datepicker-cell.selected {
+            background-color: #3b82f6 !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-800">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-plane-departure text-blue-600 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-blue-600">SkyJourney</span>
+                    </div>
+                </div>
+                <div class="hidden md:ml-6 md:flex md:items-center md:space-x-8">
+                    <a href="#" class="text-blue-600 font-medium">Flights</a>
+                    <a href="#" class="text-gray-500 hover:text-blue-600 font-medium">Hotels</a>
+                    <a href="#" class="text-gray-500 hover:text-blue-600 font-medium">Packages</a>
+                    <a href="#" class="text-gray-500 hover:text-blue-600 font-medium">Deals</a>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">Sign In</button>
+                </div>
+                <div class="-mr-2 flex items-center md:hidden">
+                    <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none">
+                        <span class="sr-only">Open main menu</span>
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Search Form -->
+    <section class="hero-section py-16 md:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Where will you go next?</h1>
+                <p class="text-xl text-gray-200 max-w-2xl mx-auto">Discover amazing destinations and book your perfect flight with SkyJourney</p>
+            </div>
+            
+            <div class="search-card rounded-xl p-6 max-w-4xl mx-auto shadow-2xl">
+                <div class="flex mb-4">
+                    <button class="flex-1 bg-blue-600 text-white py-3 px-4 rounded-l-lg font-medium">Flights</button>
+                    <button class="flex-1 bg-gray-200 text-gray-700 py-3 px-4 font-medium">Hotels</button>
+                    <button class="flex-1 bg-gray-200 text-gray-700 py-3 px-4 rounded-r-lg font-medium">Packages</button>
+                </div>
+                
+                <form id="flightSearchForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="departure" class="block text-sm font-medium text-white mb-1">From</label>
+                            <div class="relative">
+                                <input type="text" id="departure" class="form-input w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="City or Airport" required>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <i class="fas fa-plane-departure text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="destination" class="block text-sm font-medium text-white mb-1">To</label>
+                            <div class="relative">
+                                <input type="text" id="destination" class="form-input w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="City or Airport" required>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <i class="fas fa-plane-arrival text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="departureDate" class="block text-sm font-medium text-white mb-1">Departure</label>
+                            <div class="relative">
+                                <input type="text" id="departureDate" class="form-input w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 datepicker" placeholder="Select date" readonly required>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <i class="far fa-calendar-alt text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="returnDate" class="block text-sm font-medium text-white mb-1">Return</label>
+                            <div class="relative">
+                                <input type="text" id="returnDate" class="form-input w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 datepicker" placeholder="Select date" readonly>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <i class="far fa-calendar-alt text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">Cabin Class</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="cabin-class-option border-2 border-gray-200 rounded-lg p-4 cursor-pointer transition" data-class="economy">
+                                <div class="flex items-center">
+                                    <div class="bg-blue-100 p-2 rounded-full mr-3">
+                                        <i class="fas fa-chair text-blue-600"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-medium">Economy</h3>
+                                        <p class="text-sm text-gray-600">Best value</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cabin-class-option border-2 border-gray-200 rounded-lg p-4 cursor-pointer transition" data-class="premium">
+                                <div class="flex items-center">
+                                    <div class="bg-purple-100 p-2 rounded-full mr-3">
+                                        <i class="fas fa-couch text-purple-600"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-medium">Premium Economy</h3>
+                                        <p class="text-sm text-gray-600">More comfort</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cabin-class-option border-2 border-gray-200 rounded-lg p-4 cursor-pointer transition" data-class="business">
+                                <div class="flex items-center">
+                                    <div class="bg-green-100 p-2 rounded-full mr-3">
+                                        <i class="fas fa-bed text-green-600"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-medium">Business</h3>
+                                        <p class="text-sm text-gray-600">Luxury travel</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="cabinClass" name="cabinClass" value="economy">
+                    </div>
+                    
+                    <div class="pt-4">
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg transition duration-300 flex items-center justify-center">
+                            <i class="fas fa-search mr-2"></i> Search Flights
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Destinations -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-12">Popular Destinations</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="relative rounded-xl overflow-hidden h-64 group">
+                    <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1473&q=80" alt="Paris" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 p-6 text-white">
+                        <h3 class="text-xl font-bold">Paris, France</h3>
+                        <p class="text-sm opacity-80">From $399</p>
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                        <button class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">Book Now</button>
+                    </div>
+                </div>
+                <div class="relative rounded-xl overflow-hidden h-64 group">
+                    <img src="https://images.unsplash.com/photo-1538970272646-f61fabb3bfdf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1472&q=80" alt="Tokyo" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 p-6 text-white">
+                        <h3 class="text-xl font-bold">Tokyo, Japan</h3>
+                        <p class="text-sm opacity-80">From $899</p>
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                        <button class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">Book Now</button>
+                    </div>
+                </div>
+                <div class="relative rounded-xl overflow-hidden h-64 group">
+                    <img src="https://images.unsplash.com/photo-1518391846015-55a9cc003b25?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="New York" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 p-6 text-white">
+                        <h3 class="text-xl font-bold">New York, USA</h3>
+                        <p class="text-sm opacity-80">From $299</p>
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                        <button class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">Book Now</button>
+                    </div>
+                </div>
+                <div class="relative rounded-xl overflow-hidden h-64 group">
+                    <img src="https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1530&q=80" alt="Bali" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 p-6 text-white">
+                        <h3 class="text-xl font-bold">Bali, Indonesia</h3>
+                        <p class="text-sm opacity-80">From $699</p>
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                        <button class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">Book Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-12">Why Choose SkyJourney?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-md text-center">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-tag text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Best Price Guarantee</h3>
+                    <p class="text-gray-600">We guarantee the best prices for your flights. Found a better deal elsewhere? We'll match it!</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md text-center">
+                    <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-headset text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">24/7 Customer Support</h3>
+                    <p class="text-gray-600">Our travel experts are available round the clock to assist you with any queries or changes.</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md text-center">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shield-alt text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Flexible Booking Options</h3>
+                    <p class="text-gray-600">Change your plans? No problem. We offer flexible booking options with easy modifications.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-plane-departure text-blue-400 mr-2"></i> SkyJourney
+                    </h3>
+                    <p class="text-gray-400">Making travel simple, affordable and accessible for everyone.</p>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Company</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Press</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Support</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Newsletter</h3>
+                    <p class="text-gray-400 mb-4">Subscribe to get special offers and travel tips.</p>
+                    <div class="flex">
+                        <input type="email" placeholder="Your email" class="px-4 py-2 rounded-l-lg w-full text-gray-900 focus:outline-none">
+                        <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r-lg">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 SkyJourney. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Datepicker Modal -->
+    <div id="datepickerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Select Date</h3>
+                <button id="closeDatepicker" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="datepicker" class="w-full"></div>
+            <div class="flex justify-end mt-4">
+                <button id="confirmDate" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cabin Class Selection
+        const cabinOptions = document.querySelectorAll('.cabin-class-option');
+        const cabinClassInput = document.getElementById('cabinClass');
+        
+        cabinOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                cabinOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                cabinClassInput.value = option.dataset.class;
+            });
+        });
+
+        // Initialize the first option as selected
+        cabinOptions[0].classList.add('selected');
+
+        // Datepicker functionality
+        const departureDateInput = document.getElementById('departureDate');
+        const returnDateInput = document.getElementById('returnDate');
+        const datepickerModal = document.getElementById('datepickerModal');
+        const closeDatepicker = document.getElementById('closeDatepicker');
+        const confirmDate = document.getElementById('confirmDate');
+        const datepicker = document.getElementById('datepicker');
+        
+        let currentInput = null;
+        let selectedDate = null;
+
+        // Initialize datepicker
+        function initDatepicker() {
+            datepicker.innerHTML = `
+                <div class="grid grid-cols-7 gap-2 text-center mb-4">
+                    <div class="font-medium">Sun</div>
+                    <div class="font-medium">Mon</div>
+                    <div class="font-medium">Tue</div>
+                    <div class="font-medium">Wed</div>
+                    <div class="font-medium">Thu</div>
+                    <div class="font-medium">Fri</div>
+                    <div class="font-medium">Sat</div>
+                </div>
+                <div id="calendarDays" class="grid grid-cols-7 gap-2"></div>
+            `;
+            
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            
+            renderCalendar(currentMonth, currentYear);
+        }
+
+        function renderCalendar(month, year) {
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const calendarDays = document.getElementById('calendarDays');
+            
+            calendarDays.innerHTML = '';
+            
+            // Add empty cells for days before the first day of the month
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'h-10';
+                calendarDays.appendChild(emptyCell);
+            }
+            
+            // Add cells for each day of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dateString = formatDate(date);
+                
+                const dayCell = document.createElement('div');
+                dayCell.className = 'h-10 flex items-center justify-center rounded-full cursor-pointer hover:bg-gray-100';
+                dayCell.textContent = day;
+                dayCell.dataset.date = dateString;
+                
+                // Highlight today
+                const today = new Date();
+                if (date.getDate() === today.getDate() && 
+                    date.getMonth() === today.getMonth() && 
+                    date.getFullYear() === today.getFullYear()) {
+                    dayCell.classList.add('bg-blue-100', 'font-medium');
+                }
+                
+                // Highlight selected date
+                if (selectedDate && dateString === selectedDate) {
+                    dayCell.classList.add('bg-blue-600', 'text-white');
+                }
+                
+                // Disable past dates
+                if (date < today && date.getDate() !== today.getDate()) {
+                    dayCell.classList.add('text-gray-400', 'cursor-not-allowed');
+                } else {
+                    dayCell.addEventListener('click', () => {
+                        document.querySelectorAll('#calendarDays > div').forEach(cell => {
+                            cell.classList.remove('bg-blue-600', 'text-white');
+                        });
+                        dayCell.classList.add('bg-blue-600', 'text-white');
+                        selectedDate = dateString;
+                    });
+                }
+                
+                calendarDays.appendChild(dayCell);
+            }
+        }
+
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function displayDatepicker(input) {
+            currentInput = input;
+            selectedDate = input.value || '';
+            initDatepicker();
+            datepickerModal.classList.remove('hidden');
+        }
+
+        departureDateInput.addEventListener('click', () => displayDatepicker(departureDateInput));
+        returnDateInput.addEventListener('click', () => displayDatepicker(returnDateInput));
+
+        closeDatepicker.addEventListener('click', () => {
+            datepickerModal.classList.add('hidden');
+        });
+
+        confirmDate.addEventListener('click', () => {
+            if (selectedDate) {
+                const date = new Date(selectedDate);
+                const options = { weekday: 'short', month: 'short', day: 'numeric' };
+                currentInput.value = date.toLocaleDateString('en-US', options);
+                
+                // If we're setting departure date and return date is before it, clear return date
+                if (currentInput === departureDateInput && returnDateInput.value) {
+                    const returnDate = new Date(returnDateInput.dataset.dateValue || '');
+                    if (returnDate < date) {
+                        returnDateInput.value = '';
+                    }
+                }
+                
+                currentInput.dataset.dateValue = selectedDate;
+            }
+            datepickerModal.classList.add('hidden');
+        });
+
+        // Form submission
+        document.getElementById('flightSearchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const departure = document.getElementById('departure').value;
+            const destination = document.getElementById('destination').value;
+            const departureDate = document.getElementById('departureDate').value;
+            const returnDate = document.getElementById('returnDate').value;
+            const cabinClass = document.getElementById('cabinClass').value;
+            
+            // In a real app, you would send this data to your backend
+            console.log('Searching flights with:', {
+                departure,
+                destination,
+                departureDate,
+                returnDate,
+                cabinClass
+            });
+            
+            // Show a success message (in a real app, you'd redirect to search results)
+            alert(`Searching for flights from ${departure} to ${destination} departing on ${departureDate}${returnDate ? ` and returning on ${returnDate}` : ''} in ${cabinClass} class.`);
+        });
+    </script>
+</body>
+</html>
