@@ -62,6 +62,49 @@
             background-color: #3b82f6 !important;
         }
         
+        /* City suggestions dropdown */
+        .city-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            max-height: 300px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            display: none;
+        }
+        
+        .city-suggestion {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        
+        .city-suggestion:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .city-suggestion i {
+            margin-left: 0.5rem;
+            color: #6b7280;
+        }
+        
+        .city-suggestion .city-name {
+            font-weight: 500;
+        }
+        
+        .city-suggestion .country-name {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+        }
+        
         /* RTL specific styles */
         [dir="rtl"] .rtl-ml-3 {
             margin-left: 0;
@@ -159,6 +202,7 @@
                                 <div class="absolute inset-y-0 left-0 flex items-center rtl-pl-3 pointer-events-none">
                                     <i class="fas fa-plane-departure text-gray-400"></i>
                                 </div>
+                                <div id="departureSuggestions" class="city-suggestions"></div>
                             </div>
                         </div>
                         <div>
@@ -168,6 +212,7 @@
                                 <div class="absolute inset-y-0 left-0 flex items-center rtl-pl-3 pointer-events-none">
                                     <i class="fas fa-plane-arrival text-gray-400"></i>
                                 </div>
+                                <div id="destinationSuggestions" class="city-suggestions"></div>
                             </div>
                         </div>
                     </div>
@@ -394,6 +439,150 @@
     </div>
 
     <script>
+        // Major cities around the world with Arabic names
+        const cities = [
+            { name: "الرياض", country: "السعودية", code: "RUH" },
+            { name: "جدة", country: "السعودية", code: "JED" },
+            { name: "دبي", country: "الإمارات", code: "DXB" },
+            { name: "أبوظبي", country: "الإمارات", code: "AUH" },
+            { name: "الدوحة", country: "قطر", code: "DOH" },
+            { name: "الكويت", country: "الكويت", code: "KWI" },
+            { name: "المنامة", country: "البحرين", code: "BAH" },
+            { name: "مسقط", country: "عمان", code: "MCT" },
+            { name: "بيروت", country: "لبنان", code: "BEY" },
+            { name: "عمّان", country: "الأردن", code: "AMM" },
+            { name: "القاهرة", country: "مصر", code: "CAI" },
+            { name: "الدار البيضاء", country: "المغرب", code: "CAS" },
+            { name: "تونس", country: "تونس", code: "TUN" },
+            { name: "الجزائر", country: "الجزائر", code: "ALG" },
+            { name: "إسطنبول", country: "تركيا", code: "IST" },
+            { name: "أنقرة", country: "تركيا", code: "ANK" },
+            { name: "لندن", country: "المملكة المتحدة", code: "LON" },
+            { name: "باريس", country: "فرنسا", code: "PAR" },
+            { name: "روما", country: "إيطاليا", code: "ROM" },
+            { name: "برلين", country: "ألمانيا", code: "BER" },
+            { name: "مدريد", country: "إسبانيا", code: "MAD" },
+            { name: "نيويورك", country: "الولايات المتحدة", code: "NYC" },
+            { name: "لوس أنجلوس", country: "الولايات المتحدة", code: "LAX" },
+            { name: "شيكاغو", country: "الولايات المتحدة", code: "ORD" },
+            { name: "تورونتو", country: "كندا", code: "YYZ" },
+            { name: "مونتريال", country: "كندا", code: "YUL" },
+            { name: "طوكيو", country: "اليابان", code: "TYO" },
+            { name: "أوساكا", country: "اليابان", code: "OSA" },
+            { name: "سيول", country: "كوريا الجنوبية", code: "SEL" },
+            { name: "بكين", country: "الصين", code: "PEK" },
+            { name: "شنغهاي", country: "الصين", code: "SHA" },
+            { name: "هونج كونج", country: "الصين", code: "HKG" },
+            { name: "سنغافورة", country: "سنغافورة", code: "SIN" },
+            { name: "بانكوك", country: "تايلاند", code: "BKK" },
+            { name: "كوالالمبور", country: "ماليزيا", code: "KUL" },
+            { name: "جاكرتا", country: "إندونيسيا", code: "JKT" },
+            { name: "سيدني", country: "أستراليا", code: "SYD" },
+            { name: "ملبورن", country: "أستراليا", code: "MEL" },
+            { name: "أوكلاند", country: "نيوزيلندا", code: "AKL" },
+            { name: "موسكو", country: "روسيا", code: "MOW" },
+            { name: "سانت بطرسبرغ", country: "روسيا", code: "LED" },
+            { name: "مومباي", country: "الهند", code: "BOM" },
+            { name: "دلهي", country: "الهند", code: "DEL" },
+            { name: "بنغالور", country: "الهند", code: "BLR" },
+            { name: "ريو دي جانيرو", country: "البرازيل", code: "RIO" },
+            { name: "ساو باولو", country: "البرازيل", code: "SAO" },
+            { name: "بوينس آيرس", country: "الأرجنتين", code: "BUE" },
+            { name: "مكسيكو سيتي", country: "المكسيك", code: "MEX" },
+            { name: "جوهانسبرغ", country: "جنوب أفريقيا", code: "JNB" },
+            { name: "كيب تاون", country: "جنوب أفريقيا", code: "CPT" }
+        ];
+
+        // City suggestions functionality
+        const departureInput = document.getElementById('departure');
+        const destinationInput = document.getElementById('destination');
+        const departureSuggestions = document.getElementById('departureSuggestions');
+        const destinationSuggestions = document.getElementById('destinationSuggestions');
+
+        function showSuggestions(input, suggestionsContainer) {
+            const inputValue = input.value.toLowerCase();
+            if (inputValue.length < 1) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+
+            const filteredCities = cities.filter(city => 
+                city.name.toLowerCase().includes(inputValue) || 
+                city.country.toLowerCase().includes(inputValue) ||
+                city.code.toLowerCase().includes(inputValue)
+            );
+
+            if (filteredCities.length === 0) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+
+            suggestionsContainer.innerHTML = '';
+            filteredCities.slice(0, 5).forEach(city => {
+                const suggestion = document.createElement('div');
+                suggestion.className = 'city-suggestion';
+                suggestion.innerHTML = `
+                    <span class="city-name">${city.name}</span>
+                    <span class="country-name">${city.country}</span>
+                    <i class="fas fa-plane"></i>
+                    <span class="text-xs text-gray-500">${city.code}</span>
+                `;
+                suggestion.addEventListener('click', () => {
+                    input.value = `${city.name}, ${city.country}`;
+                    suggestionsContainer.style.display = 'none';
+                });
+                suggestionsContainer.appendChild(suggestion);
+            });
+
+            suggestionsContainer.style.display = 'block';
+        }
+
+        function hideSuggestions(suggestionsContainer) {
+            setTimeout(() => {
+                suggestionsContainer.style.display = 'none';
+            }, 200);
+        }
+
+        // Event listeners for departure input
+        departureInput.addEventListener('input', () => {
+            showSuggestions(departureInput, departureSuggestions);
+        });
+
+        departureInput.addEventListener('focus', () => {
+            if (departureInput.value.length > 0) {
+                showSuggestions(departureInput, departureSuggestions);
+            }
+        });
+
+        departureInput.addEventListener('blur', () => {
+            hideSuggestions(departureSuggestions);
+        });
+
+        // Event listeners for destination input
+        destinationInput.addEventListener('input', () => {
+            showSuggestions(destinationInput, destinationSuggestions);
+        });
+
+        destinationInput.addEventListener('focus', () => {
+            if (destinationInput.value.length > 0) {
+                showSuggestions(destinationInput, destinationSuggestions);
+            }
+        });
+
+        destinationInput.addEventListener('blur', () => {
+            hideSuggestions(destinationSuggestions);
+        });
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!departureInput.contains(e.target) && !departureSuggestions.contains(e.target)) {
+                departureSuggestions.style.display = 'none';
+            }
+            if (!destinationInput.contains(e.target) && !destinationSuggestions.contains(e.target)) {
+                destinationSuggestions.style.display = 'none';
+            }
+        });
+
         // Cabin Class Selection
         const cabinOptions = document.querySelectorAll('.cabin-class-option');
         const cabinClassInput = document.getElementById('cabinClass');
