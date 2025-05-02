@@ -105,6 +105,69 @@
             margin-right: 0.5rem;
         }
         
+        /* Datepicker styles */
+        .datepicker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .datepicker-month-year {
+            font-weight: bold;
+        }
+        
+        .datepicker-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .datepicker-nav button {
+            background: #f3f4f6;
+            border: none;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+        }
+        
+        .datepicker-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .datepicker-day-header {
+            text-align: center;
+            font-weight: bold;
+            padding: 0.5rem 0;
+        }
+        
+        .datepicker-day {
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+        
+        .datepicker-day:hover {
+            background: #f3f4f6;
+        }
+        
+        .datepicker-day.disabled {
+            color: #d1d5db;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        .datepicker-day.selected {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .datepicker-day.today {
+            font-weight: bold;
+        }
+        
         /* RTL specific styles */
         [dir="rtl"] .rtl-ml-3 {
             margin-left: 0;
@@ -196,7 +259,7 @@
                 <form id="flightSearchForm" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label for="departure" class="block text-sm font-medium text-white mb-1 rtl-text-right">من</label>
+                            <label for="departure", class="block text-sm font-medium text-white mb-1 rtl-text-right">من</label>
                             <div class="relative">
                                 <input type="text" id="departure" class="form-input w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rtl-pl-3 rtl-pr-10" placeholder="مدينة أو مطار" required>
                                 <div class="absolute inset-y-0 left-0 flex items-center rtl-pl-3 pointer-events-none">
@@ -327,7 +390,7 @@
                     </div>
                 </div>
                 <div class="relative rounded-xl overflow-hidden h-64 group">
-                    <img src="https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1530&q=80" alt="Bali" class="w-full h-full object-cover">
+                    <img src="https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by-wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1530&q=80" alt="Bali" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 p-6 text-white rtl-text-right">
                         <h3 class="text-xl font-bold">سيدني، أستراليا</h3>
@@ -608,27 +671,82 @@
         
         let currentInput = null;
         let selectedDate = null;
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
 
         // Initialize datepicker
         function initDatepicker() {
             datepicker.innerHTML = `
-                <div class="grid grid-cols-7 gap-2 text-center mb-4">
-                    <div class="font-medium">أحد</div>
-                    <div class="font-medium">إثنين</div>
-                    <div class="font-medium">ثلاثاء</div>
-                    <div class="font-medium">أربعاء</div>
-                    <div class="font-medium">خميس</div>
-                    <div class="font-medium">جمعة</div>
-                    <div class="font-medium">سبت</div>
+                <div class="datepicker-header">
+                    <div class="datepicker-month-year">${getMonthName(currentMonth)} ${currentYear}</div>
+                    <div class="datepicker-nav">
+                        <button id="prevMonth" class="rtl-mr-2"><i class="fas fa-chevron-right"></i></button>
+                        <button id="todayBtn">اليوم</button>
+                        <button id="nextMonth" class="rtl-ml-2"><i class="fas fa-chevron-left"></i></button>
+                    </div>
                 </div>
-                <div id="calendarDays" class="grid grid-cols-7 gap-2"></div>
+                <div class="datepicker-grid">
+                    <div class="datepicker-day-header">أحد</div>
+                    <div class="datepicker-day-header">إثنين</div>
+                    <div class="datepicker-day-header">ثلاثاء</div>
+                    <div class="datepicker-day-header">أربعاء</div>
+                    <div class="datepicker-day-header">خميس</div>
+                    <div class="datepicker-day-header">جمعة</div>
+                    <div class="datepicker-day-header">سبت</div>
+                </div>
+                <div id="calendarDays" class="datepicker-grid"></div>
             `;
             
-            const today = new Date();
-            const currentMonth = today.getMonth();
-            const currentYear = today.getFullYear();
-            
             renderCalendar(currentMonth, currentYear);
+
+            // Add event listeners for navigation
+            document.getElementById('prevMonth').addEventListener('click', () => {
+                const today = new Date();
+                const currentDate = new Date(currentYear, currentMonth - 1, 1);
+                
+                // Only allow going to previous month if it's not before current month
+                if (currentDate >= new Date(today.getFullYear(), today.getMonth(), 1)) {
+                    if (currentMonth === 0) {
+                        currentMonth = 11;
+                        currentYear--;
+                    } else {
+                        currentMonth--;
+                    }
+                    renderCalendar(currentMonth, currentYear);
+                }
+            });
+
+            document.getElementById('nextMonth').addEventListener('click', () => {
+                // Check if we're within the 11-month limit
+                const today = new Date();
+                const maxDate = new Date(today.getFullYear(), today.getMonth() + 11, today.getDate());
+                const currentDate = new Date(currentYear, currentMonth + 1, 1);
+                
+                if (currentDate < maxDate) {
+                    if (currentMonth === 11) {
+                        currentMonth = 0;
+                        currentYear++;
+                    } else {
+                        currentMonth++;
+                    }
+                    renderCalendar(currentMonth, currentYear);
+                }
+            });
+
+            document.getElementById('todayBtn').addEventListener('click', () => {
+                const today = new Date();
+                currentMonth = today.getMonth();
+                currentYear = today.getFullYear();
+                renderCalendar(currentMonth, currentYear);
+            });
+        }
+
+        function getMonthName(monthIndex) {
+            const months = [
+                "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+                "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
+            ];
+            return months[monthIndex];
         }
 
         function renderCalendar(month, year) {
@@ -641,7 +759,7 @@
             // Add empty cells for days before the first day of the month
             for (let i = 0; i < firstDay; i++) {
                 const emptyCell = document.createElement('div');
-                emptyCell.className = 'h-10';
+                emptyCell.className = 'datepicker-day disabled';
                 calendarDays.appendChild(emptyCell);
             }
             
@@ -651,37 +769,76 @@
                 const dateString = formatDate(date);
                 
                 const dayCell = document.createElement('div');
-                dayCell.className = 'h-10 flex items-center justify-center rounded-full cursor-pointer hover:bg-gray-100';
+                dayCell.className = 'datepicker-day';
                 dayCell.textContent = day;
                 dayCell.dataset.date = dateString;
                 
-                // Highlight today
+                // Get today's date (without time component)
                 const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                // Get max date (11 months from today)
+                const maxDate = new Date(today.getFullYear(), today.getMonth() + 11, today.getDate());
+                
+                // Highlight today
                 if (date.getDate() === today.getDate() && 
                     date.getMonth() === today.getMonth() && 
                     date.getFullYear() === today.getFullYear()) {
-                    dayCell.classList.add('bg-blue-100', 'font-medium');
+                    dayCell.classList.add('today');
                 }
                 
                 // Highlight selected date
                 if (selectedDate && dateString === selectedDate) {
-                    dayCell.classList.add('bg-blue-600', 'text-white');
+                    dayCell.classList.add('selected');
                 }
                 
-                // Disable past dates
-                if (date < today && date.getDate() !== today.getDate()) {
-                    dayCell.classList.add('text-gray-400', 'cursor-not-allowed');
+                // Disable past dates and dates beyond 11 months
+                if (date < today || date > maxDate) {
+                    dayCell.classList.add('disabled');
                 } else {
                     dayCell.addEventListener('click', () => {
-                        document.querySelectorAll('#calendarDays > div').forEach(cell => {
-                            cell.classList.remove('bg-blue-600', 'text-white');
+                        document.querySelectorAll('#calendarDays > .datepicker-day').forEach(cell => {
+                            cell.classList.remove('selected');
                         });
-                        dayCell.classList.add('bg-blue-600', 'text-white');
+                        dayCell.classList.add('selected');
                         selectedDate = dateString;
                     });
                 }
                 
                 calendarDays.appendChild(dayCell);
+            }
+            
+            // Update month/year display
+            document.querySelector('.datepicker-month-year').textContent = `${getMonthName(month)} ${year}`;
+            
+            // Disable prev/next month buttons if needed
+            const today = new Date();
+            const prevMonthBtn = document.getElementById('prevMonth');
+            const nextMonthBtn = document.getElementById('nextMonth');
+            
+            // Disable prev month button if we're at current month
+            if (year === today.getFullYear() && month === today.getMonth()) {
+                prevMonthBtn.disabled = true;
+                prevMonthBtn.classList.add('opacity-50');
+                prevMonthBtn.classList.add('cursor-not-allowed');
+            } else {
+                prevMonthBtn.disabled = false;
+                prevMonthBtn.classList.remove('opacity-50');
+                prevMonthBtn.classList.remove('cursor-not-allowed');
+            }
+            
+            // Disable next month button if we're at max month (11 months from now)
+            const maxDate = new Date(today.getFullYear(), today.getMonth() + 11, today.getDate());
+            const currentDate = new Date(year, month + 1, 1);
+            
+            if (currentDate >= maxDate) {
+                nextMonthBtn.disabled = true;
+                nextMonthBtn.classList.add('opacity-50');
+                nextMonthBtn.classList.add('cursor-not-allowed');
+            } else {
+                nextMonthBtn.disabled = false;
+                nextMonthBtn.classList.remove('opacity-50');
+                nextMonthBtn.classList.remove('cursor-not-allowed');
             }
         }
 
@@ -694,7 +851,21 @@
 
         function displayDatepicker(input) {
             currentInput = input;
-            selectedDate = input.value || '';
+            
+            // If there's a selected date, parse it to set current month/year
+            if (input.dataset.dateValue) {
+                const dateParts = input.dataset.dateValue.split('-');
+                currentYear = parseInt(dateParts[0]);
+                currentMonth = parseInt(dateParts[1]) - 1;
+                selectedDate = input.dataset.dateValue;
+            } else {
+                // Default to current month/year
+                const today = new Date();
+                currentMonth = today.getMonth();
+                currentYear = today.getFullYear();
+                selectedDate = null;
+            }
+            
             initDatepicker();
             datepickerModal.classList.remove('hidden');
         }
@@ -711,16 +882,16 @@
                 const date = new Date(selectedDate);
                 const options = { weekday: 'short', month: 'short', day: 'numeric' };
                 currentInput.value = date.toLocaleDateString('ar-EG', options);
+                currentInput.dataset.dateValue = selectedDate;
                 
                 // If we're setting departure date and return date is before it, clear return date
-                if (currentInput === departureDateInput && returnDateInput.value) {
-                    const returnDate = new Date(returnDateInput.dataset.dateValue || '');
+                if (currentInput === departureDateInput && returnDateInput.dataset.dateValue) {
+                    const returnDate = new Date(returnDateInput.dataset.dateValue);
                     if (returnDate < date) {
                         returnDateInput.value = '';
+                        returnDateInput.dataset.dateValue = '';
                     }
                 }
-                
-                currentInput.dataset.dateValue = selectedDate;
             }
             datepickerModal.classList.add('hidden');
         });
