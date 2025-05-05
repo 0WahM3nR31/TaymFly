@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkyJourney - Book Your Perfect Flight</title>
+    <title>SkyJourney - Book Your Perfect Trip</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
         }
         
@@ -61,6 +61,112 @@
         .datepicker-cell.selected {
             background-color: #3b82f6 !important;
         }
+        
+        /* City suggestions dropdown */
+        .city-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            max-height: 300px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            display: none;
+        }
+        
+        .city-suggestion {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        
+        .city-suggestion:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .city-suggestion i {
+            margin-right: 0.5rem;
+            color: #6b7280;
+        }
+        
+        .city-suggestion .city-name {
+            font-weight: 500;
+        }
+        
+        .city-suggestion .country-name {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-left: 0.5rem;
+        }
+        
+        /* Datepicker styles */
+        .datepicker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .datepicker-month-year {
+            font-weight: bold;
+        }
+        
+        .datepicker-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .datepicker-nav button {
+            background: #f3f4f6;
+            border: none;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+        }
+        
+        .datepicker-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .datepicker-day-header {
+            text-align: center;
+            font-weight: bold;
+            padding: 0.5rem 0;
+        }
+        
+        .datepicker-day {
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+        
+        .datepicker-day:hover {
+            background: #f3f4f6;
+        }
+        
+        .datepicker-day.disabled {
+            color: #d1d5db;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        .datepicker-day.selected {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .datepicker-day.today {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body class="min-h-screen text-gray-800">
@@ -70,11 +176,11 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <div class="flex-shrink-0 flex items-center">
-                        <i class="fas fa-plane-departure text-blue-600 text-2xl mr-2"></i>
+                        <i class="fas fa-plane-departure text-blue-600 text-2xl mr-3"></i>
                         <span class="text-xl font-bold text-blue-600">SkyJourney</span>
                     </div>
                 </div>
-                <div class="hidden md:ml-6 md:flex md:items-center md:space-x-8">
+                <div class="hidden md:ml-6 md:flex md:items-center space-x-8">
                     <a href="#" class="text-blue-600 font-medium">Flights</a>
                     <a href="#" class="text-gray-500 hover:text-blue-600 font-medium">Hotels</a>
                     <a href="#" class="text-gray-500 hover:text-blue-600 font-medium">Packages</a>
@@ -95,8 +201,8 @@
     <section class="hero-section py-16 md:py-24">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center mb-12">
-                <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Where will you go next?</h1>
-                <p class="text-xl text-gray-200 max-w-2xl mx-auto">Discover amazing destinations and book your perfect flight with SkyJourney</p>
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Where will you travel next?</h1>
+                <p class="text-xl text-gray-200 max-w-2xl mx-auto">Discover amazing destinations and book your perfect trip with SkyJourney</p>
             </div>
             
             <div class="search-card rounded-xl p-6 max-w-4xl mx-auto shadow-2xl">
@@ -111,38 +217,40 @@
                         <div>
                             <label for="departure" class="block text-sm font-medium text-white mb-1">From</label>
                             <div class="relative">
-                                <input type="text" id="departure" class="form-input w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="City or Airport" required>
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <input type="text" id="departure" class="form-input w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pl-10" placeholder="City or airport" required>
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <i class="fas fa-plane-departure text-gray-400"></i>
                                 </div>
+                                <div id="departureSuggestions" class="city-suggestions"></div>
                             </div>
                         </div>
                         <div>
                             <label for="destination" class="block text-sm font-medium text-white mb-1">To</label>
                             <div class="relative">
-                                <input type="text" id="destination" class="form-input w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="City or Airport" required>
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <input type="text" id="destination" class="form-input w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pl-10" placeholder="City or airport" required>
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <i class="fas fa-plane-arrival text-gray-400"></i>
                                 </div>
+                                <div id="destinationSuggestions" class="city-suggestions"></div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label for="departureDate" class="block text-sm font-medium text-white mb-1">Departure</label>
+                            <label for="departureDate" class="block text-sm font-medium text-white mb-1">Departure Date</label>
                             <div class="relative">
-                                <input type="text" id="departureDate" class="form-input w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 datepicker" placeholder="Select date" readonly required>
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <input type="text" id="departureDate" class="form-input w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pl-10 datepicker" placeholder="Select date" readonly required>
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <i class="far fa-calendar-alt text-gray-400"></i>
                                 </div>
                             </div>
                         </div>
                         <div>
-                            <label for="returnDate" class="block text-sm font-medium text-white mb-1">Return</label>
+                            <label for="returnDate" class="block text-sm font-medium text-white mb-1">Return Date</label>
                             <div class="relative">
-                                <input type="text" id="returnDate" class="form-input w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 datepicker" placeholder="Select date" readonly>
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <input type="text" id="returnDate" class="form-input w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pl-10 datepicker" placeholder="Select date" readonly>
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <i class="far fa-calendar-alt text-gray-400"></i>
                                 </div>
                             </div>
@@ -158,7 +266,7 @@
                                         <i class="fas fa-chair text-blue-600"></i>
                                     </div>
                                     <div>
-                                        <h3 class="font-medium">Economy</h3>
+                                        <h3 class="font-medium">Economy Class</h3>
                                         <p class="text-sm text-gray-600">Best value</p>
                                     </div>
                                 </div>
@@ -180,7 +288,7 @@
                                         <i class="fas fa-bed text-green-600"></i>
                                     </div>
                                     <div>
-                                        <h3 class="font-medium">Business</h3>
+                                        <h3 class="font-medium">Business Class</h3>
                                         <p class="text-sm text-gray-600">Luxury travel</p>
                                     </div>
                                 </div>
@@ -216,7 +324,7 @@
                     </div>
                 </div>
                 <div class="relative rounded-xl overflow-hidden h-64 group">
-                    <img src="https://images.unsplash.com/photo-1538970272646-f61fabb3bfdf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1472&q=80" alt="Tokyo" class="w-full h-full object-cover">
+                    <img src="https://plus.unsplash.com/premium_photo-1661914240950-b0124f20a5c1?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Tokyo" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 p-6 text-white">
                         <h3 class="text-xl font-bold">Tokyo, Japan</h3>
@@ -238,10 +346,10 @@
                     </div>
                 </div>
                 <div class="relative rounded-xl overflow-hidden h-64 group">
-                    <img src="https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1530&q=80" alt="Bali" class="w-full h-full object-cover">
+                    <img src="https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by-wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1530&q=80" alt="Bali" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 p-6 text-white">
-                        <h3 class="text-xl font-bold">Bali, Indonesia</h3>
+                        <h3 class="text-xl font-bold">Sydney, Australia</h3>
                         <p class="text-sm opacity-80">From $699</p>
                     </div>
                     <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
@@ -262,21 +370,21 @@
                         <i class="fas fa-tag text-blue-600 text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-2">Best Price Guarantee</h3>
-                    <p class="text-gray-600">We guarantee the best prices for your flights. Found a better deal elsewhere? We'll match it!</p>
+                    <p class="text-gray-600">We guarantee the best prices for your trips. Found a better deal elsewhere? We'll match it!</p>
                 </div>
                 <div class="bg-white p-8 rounded-xl shadow-md text-center">
                     <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-headset text-purple-600 text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-2">24/7 Customer Support</h3>
-                    <p class="text-gray-600">Our travel experts are available round the clock to assist you with any queries or changes.</p>
+                    <p class="text-gray-600">Our travel experts are available around the clock to assist with any inquiries or changes.</p>
                 </div>
                 <div class="bg-white p-8 rounded-xl shadow-md text-center">
                     <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-shield-alt text-green-600 text-2xl"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-2">Flexible Booking Options</h3>
-                    <p class="text-gray-600">Change your plans? No problem. We offer flexible booking options with easy modifications.</p>
+                    <p class="text-gray-600">Changed your plans? No problem. We offer flexible booking options with easy modifications.</p>
                 </div>
             </div>
         </div>
@@ -290,7 +398,7 @@
                     <h3 class="text-xl font-bold mb-4 flex items-center">
                         <i class="fas fa-plane-departure text-blue-400 mr-2"></i> SkyJourney
                     </h3>
-                    <p class="text-gray-400">Making travel simple, affordable and accessible for everyone.</p>
+                    <p class="text-gray-400">We make travel simple, affordable and accessible for everyone.</p>
                     <div class="flex space-x-4 mt-4">
                         <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
@@ -303,7 +411,7 @@
                     <ul class="space-y-2">
                         <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-white">Careers</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Press</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">News</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
                     </ul>
                 </div>
@@ -318,7 +426,7 @@
                 </div>
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Newsletter</h3>
-                    <p class="text-gray-400 mb-4">Subscribe to get special offers and travel tips.</p>
+                    <p class="text-gray-400 mb-4">Subscribe for special offers and travel tips.</p>
                     <div class="flex">
                         <input type="email" placeholder="Your email" class="px-4 py-2 rounded-l-lg w-full text-gray-900 focus:outline-none">
                         <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r-lg">
@@ -350,6 +458,150 @@
     </div>
 
     <script>
+        // Major cities around the world
+        const cities = [
+            { name: "Riyadh", country: "Saudi Arabia", code: "RUH" },
+            { name: "Jeddah", country: "Saudi Arabia", code: "JED" },
+            { name: "Dubai", country: "UAE", code: "DXB" },
+            { name: "Abu Dhabi", country: "UAE", code: "AUH" },
+            { name: "Doha", country: "Qatar", code: "DOH" },
+            { name: "Kuwait City", country: "Kuwait", code: "KWI" },
+            { name: "Manama", country: "Bahrain", code: "BAH" },
+            { name: "Muscat", country: "Oman", code: "MCT" },
+            { name: "Beirut", country: "Lebanon", code: "BEY" },
+            { name: "Amman", country: "Jordan", code: "AMM" },
+            { name: "Cairo", country: "Egypt", code: "CAI" },
+            { name: "Casablanca", country: "Morocco", code: "CAS" },
+            { name: "Tunis", country: "Tunisia", code: "TUN" },
+            { name: "Algiers", country: "Algeria", code: "ALG" },
+            { name: "Istanbul", country: "Turkey", code: "IST" },
+            { name: "Ankara", country: "Turkey", code: "ANK" },
+            { name: "London", country: "UK", code: "LON" },
+            { name: "Paris", country: "France", code: "PAR" },
+            { name: "Rome", country: "Italy", code: "ROM" },
+            { name: "Berlin", country: "Germany", code: "BER" },
+            { name: "Madrid", country: "Spain", code: "MAD" },
+            { name: "New York", country: "USA", code: "NYC" },
+            { name: "Los Angeles", country: "USA", code: "LAX" },
+            { name: "Chicago", country: "USA", code: "ORD" },
+            { name: "Toronto", country: "Canada", code: "YYZ" },
+            { name: "Montreal", country: "Canada", code: "YUL" },
+            { name: "Tokyo", country: "Japan", code: "TYO" },
+            { name: "Osaka", country: "Japan", code: "OSA" },
+            { name: "Seoul", country: "South Korea", code: "SEL" },
+            { name: "Beijing", country: "China", code: "PEK" },
+            { name: "Shanghai", country: "China", code: "SHA" },
+            { name: "Hong Kong", country: "China", code: "HKG" },
+            { name: "Singapore", country: "Singapore", code: "SIN" },
+            { name: "Bangkok", country: "Thailand", code: "BKK" },
+            { name: "Kuala Lumpur", country: "Malaysia", code: "KUL" },
+            { name: "Jakarta", country: "Indonesia", code: "JKT" },
+            { name: "Sydney", country: "Australia", code: "SYD" },
+            { name: "Melbourne", country: "Australia", code: "MEL" },
+            { name: "Auckland", country: "New Zealand", code: "AKL" },
+            { name: "Moscow", country: "Russia", code: "MOW" },
+            { name: "Saint Petersburg", country: "Russia", code: "LED" },
+            { name: "Mumbai", country: "India", code: "BOM" },
+            { name: "Delhi", country: "India", code: "DEL" },
+            { name: "Bangalore", country: "India", code: "BLR" },
+            { name: "Rio de Janeiro", country: "Brazil", code: "RIO" },
+            { name: "São Paulo", country: "Brazil", code: "SAO" },
+            { name: "Buenos Aires", country: "Argentina", code: "BUE" },
+            { name: "Mexico City", country: "Mexico", code: "MEX" },
+            { name: "Johannesburg", country: "South Africa", code: "JNB" },
+            { name: "Cape Town", country: "South Africa", code: "CPT" }
+        ];
+
+        // City suggestions functionality
+        const departureInput = document.getElementById('departure');
+        const destinationInput = document.getElementById('destination');
+        const departureSuggestions = document.getElementById('departureSuggestions');
+        const destinationSuggestions = document.getElementById('destinationSuggestions');
+
+        function showSuggestions(input, suggestionsContainer) {
+            const inputValue = input.value.toLowerCase();
+            if (inputValue.length < 1) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+
+            const filteredCities = cities.filter(city => 
+                city.name.toLowerCase().includes(inputValue) || 
+                city.country.toLowerCase().includes(inputValue) ||
+                city.code.toLowerCase().includes(inputValue)
+            );
+
+            if (filteredCities.length === 0) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+
+            suggestionsContainer.innerHTML = '';
+            filteredCities.slice(0, 5).forEach(city => {
+                const suggestion = document.createElement('div');
+                suggestion.className = 'city-suggestion';
+                suggestion.innerHTML = `
+                    <span class="city-name">${city.name}</span>
+                    <span class="country-name">${city.country}</span>
+                    <i class="fas fa-plane"></i>
+                    <span class="text-xs text-gray-500">${city.code}</span>
+                `;
+                suggestion.addEventListener('click', () => {
+                    input.value = `${city.name}, ${city.country}`;
+                    suggestionsContainer.style.display = 'none';
+                });
+                suggestionsContainer.appendChild(suggestion);
+            });
+
+            suggestionsContainer.style.display = 'block';
+        }
+
+        function hideSuggestions(suggestionsContainer) {
+            setTimeout(() => {
+                suggestionsContainer.style.display = 'none';
+            }, 200);
+        }
+
+        // Event listeners for departure input
+        departureInput.addEventListener('input', () => {
+            showSuggestions(departureInput, departureSuggestions);
+        });
+
+        departureInput.addEventListener('focus', () => {
+            if (departureInput.value.length > 0) {
+                showSuggestions(departureInput, departureSuggestions);
+            }
+        });
+
+        departureInput.addEventListener('blur', () => {
+            hideSuggestions(departureSuggestions);
+        });
+
+        // Event listeners for destination input
+        destinationInput.addEventListener('input', () => {
+            showSuggestions(destinationInput, destinationSuggestions);
+        });
+
+        destinationInput.addEventListener('focus', () => {
+            if (destinationInput.value.length > 0) {
+                showSuggestions(destinationInput, destinationSuggestions);
+            }
+        });
+
+        destinationInput.addEventListener('blur', () => {
+            hideSuggestions(destinationSuggestions);
+        });
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!departureInput.contains(e.target) && !departureSuggestions.contains(e.target)) {
+                departureSuggestions.style.display = 'none';
+            }
+            if (!destinationInput.contains(e.target) && !destinationSuggestions.contains(e.target)) {
+                destinationSuggestions.style.display = 'none';
+            }
+        });
+
         // Cabin Class Selection
         const cabinOptions = document.querySelectorAll('.cabin-class-option');
         const cabinClassInput = document.getElementById('cabinClass');
@@ -375,27 +627,82 @@
         
         let currentInput = null;
         let selectedDate = null;
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
 
         // Initialize datepicker
         function initDatepicker() {
             datepicker.innerHTML = `
-                <div class="grid grid-cols-7 gap-2 text-center mb-4">
-                    <div class="font-medium">Sun</div>
-                    <div class="font-medium">Mon</div>
-                    <div class="font-medium">Tue</div>
-                    <div class="font-medium">Wed</div>
-                    <div class="font-medium">Thu</div>
-                    <div class="font-medium">Fri</div>
-                    <div class="font-medium">Sat</div>
+                <div class="datepicker-header">
+                    <div class="datepicker-month-year">${getMonthName(currentMonth)} ${currentYear}</div>
+                    <div class="datepicker-nav">
+                        <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                        <button id="todayBtn">Today</button>
+                        <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                    </div>
                 </div>
-                <div id="calendarDays" class="grid grid-cols-7 gap-2"></div>
+                <div class="datepicker-grid">
+                    <div class="datepicker-day-header">Sun</div>
+                    <div class="datepicker-day-header">Mon</div>
+                    <div class="datepicker-day-header">Tue</div>
+                    <div class="datepicker-day-header">Wed</div>
+                    <div class="datepicker-day-header">Thu</div>
+                    <div class="datepicker-day-header">Fri</div>
+                    <div class="datepicker-day-header">Sat</div>
+                </div>
+                <div id="calendarDays" class="datepicker-grid"></div>
             `;
             
-            const today = new Date();
-            const currentMonth = today.getMonth();
-            const currentYear = today.getFullYear();
-            
             renderCalendar(currentMonth, currentYear);
+
+            // Add event listeners for navigation
+            document.getElementById('prevMonth').addEventListener('click', () => {
+                const today = new Date();
+                const currentDate = new Date(currentYear, currentMonth - 1, 1);
+                
+                // Only allow going to previous month if it's not before current month
+                if (currentDate >= new Date(today.getFullYear(), today.getMonth(), 1)) {
+                    if (currentMonth === 0) {
+                        currentMonth = 11;
+                        currentYear--;
+                    } else {
+                        currentMonth--;
+                    }
+                    renderCalendar(currentMonth, currentYear);
+                }
+            });
+
+            document.getElementById('nextMonth').addEventListener('click', () => {
+                // Check if we're within the 11-month limit
+                const today = new Date();
+                const maxDate = new Date(today.getFullYear(), today.getMonth() + 11, today.getDate());
+                const currentDate = new Date(currentYear, currentMonth + 1, 1);
+                
+                if (currentDate < maxDate) {
+                    if (currentMonth === 11) {
+                        currentMonth = 0;
+                        currentYear++;
+                    } else {
+                        currentMonth++;
+                    }
+                    renderCalendar(currentMonth, currentYear);
+                }
+            });
+
+            document.getElementById('todayBtn').addEventListener('click', () => {
+                const today = new Date();
+                currentMonth = today.getMonth();
+                currentYear = today.getFullYear();
+                renderCalendar(currentMonth, currentYear);
+            });
+        }
+
+        function getMonthName(monthIndex) {
+            const months = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+            return months[monthIndex];
         }
 
         function renderCalendar(month, year) {
@@ -408,7 +715,7 @@
             // Add empty cells for days before the first day of the month
             for (let i = 0; i < firstDay; i++) {
                 const emptyCell = document.createElement('div');
-                emptyCell.className = 'h-10';
+                emptyCell.className = 'datepicker-day disabled';
                 calendarDays.appendChild(emptyCell);
             }
             
@@ -418,37 +725,76 @@
                 const dateString = formatDate(date);
                 
                 const dayCell = document.createElement('div');
-                dayCell.className = 'h-10 flex items-center justify-center rounded-full cursor-pointer hover:bg-gray-100';
+                dayCell.className = 'datepicker-day';
                 dayCell.textContent = day;
                 dayCell.dataset.date = dateString;
                 
-                // Highlight today
+                // Get today's date (without time component)
                 const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                // Get max date (11 months from today)
+                const maxDate = new Date(today.getFullYear(), today.getMonth() + 11, today.getDate());
+                
+                // Highlight today
                 if (date.getDate() === today.getDate() && 
                     date.getMonth() === today.getMonth() && 
                     date.getFullYear() === today.getFullYear()) {
-                    dayCell.classList.add('bg-blue-100', 'font-medium');
+                    dayCell.classList.add('today');
                 }
                 
                 // Highlight selected date
                 if (selectedDate && dateString === selectedDate) {
-                    dayCell.classList.add('bg-blue-600', 'text-white');
+                    dayCell.classList.add('selected');
                 }
                 
-                // Disable past dates
-                if (date < today && date.getDate() !== today.getDate()) {
-                    dayCell.classList.add('text-gray-400', 'cursor-not-allowed');
+                // Disable past dates and dates beyond 11 months
+                if (date < today || date > maxDate) {
+                    dayCell.classList.add('disabled');
                 } else {
                     dayCell.addEventListener('click', () => {
-                        document.querySelectorAll('#calendarDays > div').forEach(cell => {
-                            cell.classList.remove('bg-blue-600', 'text-white');
+                        document.querySelectorAll('#calendarDays > .datepicker-day').forEach(cell => {
+                            cell.classList.remove('selected');
                         });
-                        dayCell.classList.add('bg-blue-600', 'text-white');
+                        dayCell.classList.add('selected');
                         selectedDate = dateString;
                     });
                 }
                 
                 calendarDays.appendChild(dayCell);
+            }
+            
+            // Update month/year display
+            document.querySelector('.datepicker-month-year').textContent = `${getMonthName(month)} ${year}`;
+            
+            // Disable prev/next month buttons if needed
+            const today = new Date();
+            const prevMonthBtn = document.getElementById('prevMonth');
+            const nextMonthBtn = document.getElementById('nextMonth');
+            
+            // Disable prev month button if we're at current month
+            if (year === today.getFullYear() && month === today.getMonth()) {
+                prevMonthBtn.disabled = true;
+                prevMonthBtn.classList.add('opacity-50');
+                prevMonthBtn.classList.add('cursor-not-allowed');
+            } else {
+                prevMonthBtn.disabled = false;
+                prevMonthBtn.classList.remove('opacity-50');
+                prevMonthBtn.classList.remove('cursor-not-allowed');
+            }
+            
+            // Disable next month button if we're at max month (11 months from now)
+            const maxDate = new Date(today.getFullYear(), today.getMonth() + 11, today.getDate());
+            const currentDate = new Date(year, month + 1, 1);
+            
+            if (currentDate >= maxDate) {
+                nextMonthBtn.disabled = true;
+                nextMonthBtn.classList.add('opacity-50');
+                nextMonthBtn.classList.add('cursor-not-allowed');
+            } else {
+                nextMonthBtn.disabled = false;
+                nextMonthBtn.classList.remove('opacity-50');
+                nextMonthBtn.classList.remove('cursor-not-allowed');
             }
         }
 
@@ -461,7 +807,21 @@
 
         function displayDatepicker(input) {
             currentInput = input;
-            selectedDate = input.value || '';
+            
+            // If there's a selected date, parse it to set current month/year
+            if (input.dataset.dateValue) {
+                const dateParts = input.dataset.dateValue.split('-');
+                currentYear = parseInt(dateParts[0]);
+                currentMonth = parseInt(dateParts[1]) - 1;
+                selectedDate = input.dataset.dateValue;
+            } else {
+                // Default to current month/year
+                const today = new Date();
+                currentMonth = today.getMonth();
+                currentYear = today.getFullYear();
+                selectedDate = null;
+            }
+            
             initDatepicker();
             datepickerModal.classList.remove('hidden');
         }
@@ -478,16 +838,16 @@
                 const date = new Date(selectedDate);
                 const options = { weekday: 'short', month: 'short', day: 'numeric' };
                 currentInput.value = date.toLocaleDateString('en-US', options);
+                currentInput.dataset.dateValue = selectedDate;
                 
                 // If we're setting departure date and return date is before it, clear return date
-                if (currentInput === departureDateInput && returnDateInput.value) {
-                    const returnDate = new Date(returnDateInput.dataset.dateValue || '');
+                if (currentInput === departureDateInput && returnDateInput.dataset.dateValue) {
+                    const returnDate = new Date(returnDateInput.dataset.dateValue);
                     if (returnDate < date) {
                         returnDateInput.value = '';
+                        returnDateInput.dataset.dateValue = '';
                     }
                 }
-                
-                currentInput.dataset.dateValue = selectedDate;
             }
             datepickerModal.classList.add('hidden');
         });
