@@ -167,6 +167,35 @@
         .datepicker-day.today {
             font-weight: bold;
         }
+        
+        /* Region filter tabs */
+        .region-tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 0.5rem;
+        }
+        
+        .region-tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .region-tab.active {
+            border-bottom-color: #3b82f6;
+            color: #3b82f6;
+            font-weight: 500;
+        }
+        
+        /* Flag icons */
+        .flag-icon {
+            width: 16px;
+            height: 12px;
+            margin-right: 8px;
+            display: inline-block;
+            background-size: cover;
+            border-radius: 2px;
+        }
     </style>
 </head>
 <body class="min-h-screen text-gray-800">
@@ -324,7 +353,7 @@
                     </div>
                 </div>
                 <div class="relative rounded-xl overflow-hidden h-64 group">
-                    <img src="https://plus.unsplash.com/premium_photo-1661914240950-b0124f20a5c1?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Tokyo" class="w-full h-full object-cover">
+                    <img src="https://plus.unsplash.com/premium_photo-1661914240950-b0124f20a5c1?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Tokyo" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 p-6 text-white">
                         <h3 class="text-xl font-bold">Tokyo, Japan</h3>
@@ -346,7 +375,7 @@
                     </div>
                 </div>
                 <div class="relative rounded-xl overflow-hidden h-64 group">
-                    <img src="https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by-wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1530&q=80" alt="Bali" class="w-full h-full object-cover">
+                    <img src="https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1530&q=80" alt="Bali" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 p-6 text-white">
                         <h3 class="text-xl font-bold">Sydney, Australia</h3>
@@ -458,58 +487,92 @@
     </div>
 
     <script>
-        // Major cities around the world
+        // Major cities around the world with USA, Canada, and Southeast Asia focus
         const cities = [
-            { name: "Riyadh", country: "Saudi Arabia", code: "RUH" },
-            { name: "Jeddah", country: "Saudi Arabia", code: "JED" },
-            { name: "Dubai", country: "UAE", code: "DXB" },
-            { name: "Abu Dhabi", country: "UAE", code: "AUH" },
-            { name: "Doha", country: "Qatar", code: "DOH" },
-            { name: "Kuwait City", country: "Kuwait", code: "KWI" },
-            { name: "Manama", country: "Bahrain", code: "BAH" },
-            { name: "Muscat", country: "Oman", code: "MCT" },
-            { name: "Beirut", country: "Lebanon", code: "BEY" },
-            { name: "Amman", country: "Jordan", code: "AMM" },
-            { name: "Cairo", country: "Egypt", code: "CAI" },
-            { name: "Casablanca", country: "Morocco", code: "CAS" },
-            { name: "Tunis", country: "Tunisia", code: "TUN" },
-            { name: "Algiers", country: "Algeria", code: "ALG" },
-            { name: "Istanbul", country: "Turkey", code: "IST" },
-            { name: "Ankara", country: "Turkey", code: "ANK" },
-            { name: "London", country: "UK", code: "LON" },
-            { name: "Paris", country: "France", code: "PAR" },
-            { name: "Rome", country: "Italy", code: "ROM" },
-            { name: "Berlin", country: "Germany", code: "BER" },
-            { name: "Madrid", country: "Spain", code: "MAD" },
-            { name: "New York", country: "USA", code: "NYC" },
-            { name: "Los Angeles", country: "USA", code: "LAX" },
-            { name: "Chicago", country: "USA", code: "ORD" },
-            { name: "Toronto", country: "Canada", code: "YYZ" },
-            { name: "Montreal", country: "Canada", code: "YUL" },
-            { name: "Tokyo", country: "Japan", code: "TYO" },
-            { name: "Osaka", country: "Japan", code: "OSA" },
-            { name: "Seoul", country: "South Korea", code: "SEL" },
-            { name: "Beijing", country: "China", code: "PEK" },
-            { name: "Shanghai", country: "China", code: "SHA" },
-            { name: "Hong Kong", country: "China", code: "HKG" },
-            { name: "Singapore", country: "Singapore", code: "SIN" },
-            { name: "Bangkok", country: "Thailand", code: "BKK" },
-            { name: "Kuala Lumpur", country: "Malaysia", code: "KUL" },
-            { name: "Jakarta", country: "Indonesia", code: "JKT" },
-            { name: "Sydney", country: "Australia", code: "SYD" },
-            { name: "Melbourne", country: "Australia", code: "MEL" },
-            { name: "Auckland", country: "New Zealand", code: "AKL" },
-            { name: "Moscow", country: "Russia", code: "MOW" },
-            { name: "Saint Petersburg", country: "Russia", code: "LED" },
-            { name: "Mumbai", country: "India", code: "BOM" },
-            { name: "Delhi", country: "India", code: "DEL" },
-            { name: "Bangalore", country: "India", code: "BLR" },
-            { name: "Rio de Janeiro", country: "Brazil", code: "RIO" },
-            { name: "São Paulo", country: "Brazil", code: "SAO" },
-            { name: "Buenos Aires", country: "Argentina", code: "BUE" },
-            { name: "Mexico City", country: "Mexico", code: "MEX" },
-            { name: "Johannesburg", country: "South Africa", code: "JNB" },
-            { name: "Cape Town", country: "South Africa", code: "CPT" }
+            // USA Cities
+            { name: "New York", country: "USA", code: "NYC", region: "usa" },
+            { name: "Los Angeles", country: "USA", code: "LAX", region: "usa" },
+            { name: "Chicago", country: "USA", code: "ORD", region: "usa" },
+            { name: "Houston", country: "USA", code: "IAH", region: "usa" },
+            { name: "Phoenix", country: "USA", code: "PHX", region: "usa" },
+            { name: "Philadelphia", country: "USA", code: "PHL", region: "usa" },
+            { name: "San Antonio", country: "USA", code: "SAT", region: "usa" },
+            { name: "San Diego", country: "USA", code: "SAN", region: "usa" },
+            { name: "Dallas", country: "USA", code: "DFW", region: "usa" },
+            { name: "San Jose", country: "USA", code: "SJC", region: "usa" },
+            { name: "Austin", country: "USA", code: "AUS", region: "usa" },
+            { name: "Jacksonville", country: "USA", code: "JAX", region: "usa" },
+            { name: "San Francisco", country: "USA", code: "SFO", region: "usa" },
+            { name: "Columbus", country: "USA", code: "CMH", region: "usa" },
+            { name: "Charlotte", country: "USA", code: "CLT", region: "usa" },
+            { name: "Indianapolis", country: "USA", code: "IND", region: "usa" },
+            { name: "Seattle", country: "USA", code: "SEA", region: "usa" },
+            { name: "Denver", country: "USA", code: "DEN", region: "usa" },
+            { name: "Washington", country: "USA", code: "DCA", region: "usa" },
+            { name: "Boston", country: "USA", code: "BOS", region: "usa" },
+            { name: "El Paso", country: "USA", code: "ELP", region: "usa" },
+            { name: "Nashville", country: "USA", code: "BNA", region: "usa" },
+            { name: "Detroit", country: "USA", code: "DTW", region: "usa" },
+            { name: "Oklahoma City", country: "USA", code: "OKC", region: "usa" },
+            { name: "Portland", country: "USA", code: "PDX", region: "usa" },
+            { name: "Las Vegas", country: "USA", code: "LAS", region: "usa" },
+            { name: "Memphis", country: "USA", code: "MEM", region: "usa" },
+            { name: "Louisville", country: "USA", code: "SDF", region: "usa" },
+            { name: "Baltimore", country: "USA", code: "BWI", region: "usa" },
+            { name: "Milwaukee", country: "USA", code: "MKE", region: "usa" },
+            
+            // Canada Cities
+            { name: "Toronto", country: "Canada", code: "YYZ", region: "canada" },
+            { name: "Montreal", country: "Canada", code: "YUL", region: "canada" },
+            { name: "Vancouver", country: "Canada", code: "YVR", region: "canada" },
+            { name: "Calgary", country: "Canada", code: "YYC", region: "canada" },
+            { name: "Edmonton", country: "Canada", code: "YEG", region: "canada" },
+            { name: "Ottawa", country: "Canada", code: "YOW", region: "canada" },
+            { name: "Winnipeg", country: "Canada", code: "YWG", region: "canada" },
+            { name: "Quebec City", country: "Canada", code: "YQB", region: "canada" },
+            { name: "Hamilton", country: "Canada", code: "YHM", region: "canada" },
+            { name: "Halifax", country: "Canada", code: "YHZ", region: "canada" },
+            { name: "Victoria", country: "Canada", code: "YYJ", region: "canada" },
+            { name: "Regina", country: "Canada", code: "YQR", region: "canada" },
+            { name: "Saskatoon", country: "Canada", code: "YXE", region: "canada" },
+            { name: "St. John's", country: "Canada", code: "YYT", region: "canada" },
+            
+            // Southeast Asia Cities
+            { name: "Bangkok", country: "Thailand", code: "BKK", region: "seasia" },
+            { name: "Singapore", country: "Singapore", code: "SIN", region: "seasia" },
+            { name: "Kuala Lumpur", country: "Malaysia", code: "KUL", region: "seasia" },
+            { name: "Jakarta", country: "Indonesia", code: "CGK", region: "seasia" },
+            { name: "Manila", country: "Philippines", code: "MNL", region: "seasia" },
+            { name: "Ho Chi Minh City", country: "Vietnam", code: "SGN", region: "seasia" },
+            { name: "Hanoi", country: "Vietnam", code: "HAN", region: "seasia" },
+            { name: "Phnom Penh", country: "Cambodia", code: "PNH", region: "seasia" },
+            { name: "Vientiane", country: "Laos", code: "VTE", region: "seasia" },
+            { name: "Yangon", country: "Myanmar", code: "RGN", region: "seasia" },
+            { name: "Bandar Seri Begawan", country: "Brunei", code: "BWN", region: "seasia" },
+            { name: "Dili", country: "Timor-Leste", code: "DIL", region: "seasia" },
+            { name: "Penang", country: "Malaysia", code: "PEN", region: "seasia" },
+            { name: "Cebu", country: "Philippines", code: "CEB", region: "seasia" },
+            { name: "Denpasar", country: "Indonesia", code: "DPS", region: "seasia" },
+            { name: "Medan", country: "Indonesia", code: "KNO", region: "seasia" },
+            { name: "Chiang Mai", country: "Thailand", code: "CNX", region: "seasia" },
+            { name: "Phuket", country: "Thailand", code: "HKT", region: "seasia" },
+            { name: "Da Nang", country: "Vietnam", code: "DAD", region: "seasia" },
+            { name: "Hai Phong", country: "Vietnam", code: "HPH", region: "seasia" },
+            
+            // Other major cities
+            { name: "London", country: "UK", code: "LHR", region: "europe" },
+            { name: "Paris", country: "France", code: "CDG", region: "europe" },
+            { name: "Tokyo", country: "Japan", code: "HND", region: "asia" },
+            { name: "Sydney", country: "Australia", code: "SYD", region: "oceania" },
+            { name: "Dubai", country: "UAE", code: "DXB", region: "middleeast" },
+            { name: "Hong Kong", country: "China", code: "HKG", region: "asia" },
+            { name: "Shanghai", country: "China", code: "PVG", region: "asia" },
+            { name: "Moscow", country: "Russia", code: "SVO", region: "europe" },
+            { name: "Istanbul", country: "Turkey", code: "IST", region: "middleeast" },
+            { name: "Cairo", country: "Egypt", code: "CAI", region: "africa" },
+            { name: "Johannesburg", country: "South Africa", code: "JNB", region: "africa" },
+            { name: "São Paulo", country: "Brazil", code: "GRU", region: "samerica" },
+            { name: "Mexico City", country: "Mexico", code: "MEX", region: "namerica" }
         ];
 
         // City suggestions functionality
@@ -536,22 +599,55 @@
                 return;
             }
 
-            suggestionsContainer.innerHTML = '';
-            filteredCities.slice(0, 5).forEach(city => {
-                const suggestion = document.createElement('div');
-                suggestion.className = 'city-suggestion';
-                suggestion.innerHTML = `
-                    <span class="city-name">${city.name}</span>
-                    <span class="country-name">${city.country}</span>
-                    <i class="fas fa-plane"></i>
-                    <span class="text-xs text-gray-500">${city.code}</span>
-                `;
-                suggestion.addEventListener('click', () => {
-                    input.value = `${city.name}, ${city.country}`;
-                    suggestionsContainer.style.display = 'none';
-                });
-                suggestionsContainer.appendChild(suggestion);
+            // Group cities by region
+            const regions = {
+                usa: { name: "United States", cities: [] },
+                canada: { name: "Canada", cities: [] },
+                seasia: { name: "Southeast Asia", cities: [] },
+                other: { name: "Other Regions", cities: [] }
+            };
+
+            filteredCities.forEach(city => {
+                if (city.region === "usa") {
+                    regions.usa.cities.push(city);
+                } else if (city.region === "canada") {
+                    regions.canada.cities.push(city);
+                } else if (city.region === "seasia") {
+                    regions.seasia.cities.push(city);
+                } else {
+                    regions.other.cities.push(city);
+                }
             });
+
+            suggestionsContainer.innerHTML = '';
+            
+            // Only show regions that have cities
+            for (const region in regions) {
+                if (regions[region].cities.length > 0) {
+                    // Add region header
+                    const regionHeader = document.createElement('div');
+                    regionHeader.className = 'px-4 py-2 bg-gray-100 font-medium text-sm text-gray-700';
+                    regionHeader.textContent = regions[region].name;
+                    suggestionsContainer.appendChild(regionHeader);
+                    
+                    // Add cities for this region
+                    regions[region].cities.slice(0, 5).forEach(city => {
+                        const suggestion = document.createElement('div');
+                        suggestion.className = 'city-suggestion';
+                        suggestion.innerHTML = `
+                            <span class="city-name">${city.name}</span>
+                            <span class="country-name">${city.country}</span>
+                            <i class="fas fa-plane"></i>
+                            <span class="text-xs text-gray-500">${city.code}</span>
+                        `;
+                        suggestion.addEventListener('click', () => {
+                            input.value = `${city.name}, ${city.country}`;
+                            suggestionsContainer.style.display = 'none';
+                        });
+                        suggestionsContainer.appendChild(suggestion);
+                    });
+                }
+            }
 
             suggestionsContainer.style.display = 'block';
         }
